@@ -57,26 +57,23 @@
      on, and if you don't decide it here you'll discover it as a crash in
      Milestone 5. -->
 
-### `search_listings`
+### search_listings
+- Does: searches listings by keyword, optional size and max price
+- Inputs: description (str), size (str or None), max_price (float or None)
+- Returns: list of listing dicts, best match first
+- Empty case: returns an empty list
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+### suggest_outfit
+- Does: suggests outfits pairing a new item with the user's wardrobe
+- Inputs: new_item (dict), wardrobe (dict with "items" key)
+- Returns: a string with 1-2 outfit suggestions
+- Empty case: if wardrobe has no items, gives general styling advice instead
 
-### `suggest_outfit`
-
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
-
-### `create_fit_card`
-
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+### create_fit_card
+- Does: writes a short social-caption-style blurb about the item and outfit
+- Inputs: outfit (str), new_item (dict)
+- Returns: a 2-4 sentence caption string
+- Empty case: if outfit is empty/blank, returns a message saying so instead of calling the model
 
 ---
 
@@ -93,13 +90,11 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
-
-**Where it lives:** `agent.py::run_agent`
-
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
-
-**What moves through the session:** <!-- which fields, in what order -->
+### Branch rule
+If search_listings returns an empty list, the loop puts a message in
+session["error"] explaining what to try differently, and stops — it does
+not call suggest_outfit. Otherwise, the loop takes the first search result
+and continues through suggest_outfit and create_fit_card.
 
 ---
 
