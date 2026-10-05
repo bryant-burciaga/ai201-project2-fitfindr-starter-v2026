@@ -25,9 +25,11 @@ Given a query that matches at least one listing, the agent completes all three
 tool calls and returns a fit card — in at least 4 of 5 tries.
 
 **Why this target:**
-<!-- Why 4 of 5 and not 5 of 5? Something about your search, probably —
-     "my search is a plain keyword match and some phrasings will miss" is a
-     real answer. -->
+This search is a keyword-overlap match it scores a listing by how many
+words from the description appear in its title, tags, or description. A
+phrasing that uses a synonym the listing doesn't ("tee" vs "tshirt", or a
+style word the data doesn't use) can score zero and miss a real match. 4 of 5
+leaves room for that without accepting a search that misses constantly.
 
 ---
 
@@ -37,8 +39,11 @@ Given a query that matches no listings, the agent stops before calling
 `suggest_outfit` and returns a message naming what to change — 5 of 5 tries.
 
 **Why this target:**
-<!-- Why is 5 of 5 reasonable here when criterion 1 isn't? What's different
-     about this path? -->
+
+This path is plain code with no model call and no fuzzy matching. If
+search_listings returns an empty list, the branch unconditionally sets
+session["error"] and returns. There's no keyword-matching ambiguity here like
+there is in criterion 1, so it should be deterministic every time.
 
 ---
 
@@ -53,11 +58,6 @@ suggest_outfit — checked by comparing ids directly — in 5 of 5 tries.
 This is a plain dictionary lookup with no model call involved, so there's
 no randomness to account for. If the session correctly carries the item
 once, it should carry it every time.
-
-
-
-
-
 
 
 ---
