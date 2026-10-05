@@ -107,8 +107,54 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     """
     session = new_session(query, wardrobe)
 
-    # TODO: delete these two lines and build the loop.
-    session["error"] = "The planning loop isn't built yet — see the TODO in agent.py."
+    import re
+
+    # Step 1: parse the query into description / size / max_price
+    price_match = re.search(r"under \$?(\d+)", query, re.IGNORECASE)
+    max_price = float(price_match.group(1)) if price_match else None
+
+    size_match = re.search(r"\bsize (\w+)\b", query, re.IGNORECASE)
+    size = size_match.group(1) if size_match else None
+
+    description = query
+    if price_match:
+        description = description.replace(price_match.group(0), "")
+    if size_match:
+        description = description.replace(size_match.group(0), "")
+    description = description.strip()
+
+    session["parsed"] = {
+        "description": description,
+        "size": size,
+        "max_price": max_price,
+    }
+
+    # Step 2: search
+    results = search_listings(description, size=size, max_price=max_price)
+    session["search_results"] = results
+
+    # ── THE BRANCH ──
+    if not results:
+        session["error"] = (
+            f"No listings matched '{description}'"
+            + (f" under ${max_price:.0f}" if max_price else "")
+            + (f" in size {size}" if size else "")
+            + ". Try a broader description, a higher price, or a different size."
+        )
+        return session
+
+    # Step 3: pick the top result
+    selected = results[0]
+    session["selected_item"] = selected
+
+    # Step 4: get an outfit suggestion
+    outfit = suggest_outfit(selected, wardrobe)
+    session["outfit_suggestion"] = outfit
+
+    # Step 5: write the fit card
+    fit_card = create_fit_card(outfit, selected)
+    session["fit_card"] = fit_card
+
     return session
 
 
