@@ -112,21 +112,35 @@ This lives in agent.py, in the run_agent() function.
 
 Command: `./.venv/bin/python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"`
 
-Output: (paste the list of listings it returned)
+Output: [{'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.', 'category': 'tops', 'style_tags': ['y2k', 'vintage', 'graphic tee', 'cottagecore'], 'size': 'S/M', 'condition': 'excellent', 'price': 18.0, 'colors': ['white', 'pink', 'purple'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_006', 'title': 'Graphic Tee — 2003 Tour Bootleg Style', ...}]  (6 listings total, truncated here for README length — full output confirmed in terminal)
 
 Command: `./.venv/bin/python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"`
 
-Output: (paste the two-outfit text it returned)
+Output: **Outfit 1: Casual Streetwear**
+Pair the vintage Levi's 501s with the white ribbed tank top tucked in, layering the oversized grey crewneck sweatshirt on top for an effortless, textured look. Finish the outfit with the chunky white sneakers and the black crossbody bag for an easy, everyday vibe.
+
+**Outfit 2: Edgy Contrast**
+Style the medium wash jeans with the black cropped zip hoodie to play with proportions, cinched at the waist using the brown leather belt. Ground the look with the black combat boots and throw on the vintage black denim jacket for a cool, double-denim aesthetic.
 
 Command: `./.venv/bin/python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"`
 
-Output: (paste the caption it returned)
-
+Output: Found my holy grail denim on Depop for just $38! Honestly obsessed with the wash on these vintage 501s. Paired them with crisp white sneakers and I'm officially never taking them off.
 ### Full agent run
 
 Command: `./.venv/bin/python agent.py`
 
-Output: (paste the full output — both the matching query and the "can't match" query)
+Output: === A query the data can match ===
+  found:    Y2K Baby Tee — Butterfly Print — $18.0 on depop
+  outfit:   **Outfit 1: Casual Y2K Contrast**
+Pair the butterfly baby tee with your baggy dark-wash straight-leg jeans for a classic early-2000s silhouette. Cinch the waist with your brown leather belt, and finish the look with chunky white sneakers and the black crossbody bag.
+
+**Outfit 2: Edgy Streetwear Mix**
+Layer the feminine graphic tee underneath your black cropped zip hoodie for a balanced, textured look paired with your wide-leg khaki trousers. Ground the outfit with your black combat boots to lean into an effortless vintage-meets-modern aesthetic.
+  fit card: Obsessed with this little butterfly tee I scored on Depop for just $18! 🦋 It's so easy to dress down with baggy denim and chunky sneakers, or layer under a zip hoodie with combat boots for when I want a more edgy vibe. Which fit are we feeling more?
+
+=== A query it can't ===
+  stopped: No listings matched 'designer ballgown' under $5 in size XXS. Try a broader description, a higher price, or a different size.
+  fit_card is None — it should still be None here
 
 ---
 
