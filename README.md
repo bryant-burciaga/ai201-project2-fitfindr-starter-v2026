@@ -39,7 +39,12 @@
 
 ## What This Does
 
-<!-- Three or four sentences: what a user asks for, and what they get back. -->
+FitFindr is an agent that helps with thrifting. Users can give it a plain-language
+request like "vintage graphic tee under $30" and it searches a listings
+dataset, picks the best match, suggests how to style it with your existing
+wardrobe, and writes a short social-media-style caption about the find. If
+nothing in the data matches the request, it stops and tells you what to
+change instead of guessing.
 
 
 
@@ -90,44 +95,38 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-### Branch rule
-If search_listings returns an empty list, the loop puts a message in
-session["error"] explaining what to try differently, and stops — it does
-not call suggest_outfit. Otherwise, the loop takes the first search result
-and continues through suggest_outfit and create_fit_card.
+## Planning Loop
+
+Branch rule: if search_listings returns an empty list, the loop puts a
+specific message in session["error"] and stops before calling
+suggest_outfit. Otherwise it takes the first search result and continues
+through suggest_outfit and create_fit_card.
+
+This lives in agent.py, in the run_agent() function.
 
 ---
 
 ## Sample Run
 
-<!-- Two things go here.
+### Per-tool terminal tests
 
-     1. One FULL query and its output, pasted as text.
-     2. Your three per-tool terminal tests — the command and what it printed. -->
+Command: `./.venv/bin/python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"`
 
-**One full query**
+Output: (paste the list of listings it returned)
 
-```
-$ python app.py ask '...'
+Command: `./.venv/bin/python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"`
 
-```
+Output: (paste the two-outfit text it returned)
 
-**The three tools, tested one at a time**
+Command: `./.venv/bin/python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"`
 
-```
-$ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
+Output: (paste the caption it returned)
 
-```
+### Full agent run
 
-```
-$ python -c "from tools import suggest_outfit; ..."
+Command: `./.venv/bin/python agent.py`
 
-```
-
-```
-$ python -c "from tools import create_fit_card; ..."
-
-```
+Output: (paste the full output — both the matching query and the "can't match" query)
 
 ---
 
@@ -139,6 +138,9 @@ $ python -c "from tools import create_fit_card; ..."
 
      "I gave Claude my search_listings spec. It returned None on no match
      instead of an empty list, so I changed it" is the level we want. -->
+
+I used claude extensively on this particular project, in particular to help with implementing the three tool funcitons in tools.py, the planning loop in agent.py, and working with the README and all of the different TODOs in the starter code. I did end up using a keyword matching approached that I asked claude for help on in the search_listings and helped to make sure all the words in the title, description, style, etc. all worked. I also used it to help with testing all of the different loops to help complete all the milestones. 
+
 
 **Moment 1**
 
