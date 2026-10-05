@@ -42,59 +42,56 @@ Given a query that matches no listings, the agent stops before calling
 
 ---
 
-## 3. Something about state
+## 3. The item that matched is the item that gets styled
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know that the item your search found is the same item the
-     next tool received? Name something countable or observable.
-
-     This is the criterion people find hardest, because state failure doesn't
-     look like state failure — it looks like a tool problem. Something that
-     compares session["selected_item"] against what actually reached
-     suggest_outfit is the shape you're after. -->
-
-
+Given a query that matches at least one listing, the "id" of
+session["selected_item"] after the run is the same id that was passed into
+suggest_outfit — checked by comparing ids directly — in 5 of 5 tries.
 
 **Why this target:**
+
+This is a plain dictionary lookup with no model call involved, so there's
+no randomness to account for. If the session correctly carries the item
+once, it should carry it every time.
+
+
+
+
 
 
 
 ---
 
-## 4. Something about the fit card
+## 4. Fit cards aren't identical copies of each other
 
-<!-- YOU WRITE THIS ONE.
-
-     The fit card calls a model, so the same input can produce different words
-     each time. That's not a bug — it's the nature of the tool. So what would
-     make it acceptable?
-
-     Think about what you'd actually be unhappy to see. A caption that never
-     mentions the price? Two different items producing the same opening
-     sentence? A card longer than a caption anyone would post? Any of those can
-     be turned into a number. -->
-
-
+Given the same item run through create_fit_card three separate times, the
+three captions are not word-for-word identical to each other — in at least
+2 of 3 tries.
 
 **Why this target:**
 
+TEMPERATURE is set to 0.9, so real variation is expected, but not
+guaranteed on every single call — the model could still land on similar
+phrasing by chance for a short caption. 2 of 3 leaves room for that without
+letting the test pass if caching or a stuck temperature setting is quietly
+producing the same caption every time.
 
 
 ---
 
-## 5. Your choice
+## 5. A bad search gives a specific reason, not a dead end
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. Speed, the empty
-     wardrobe path, what happens when the model can't be reached, whether the
-     search respects a price ceiling — anything, as long as it names a number
-     or an observable outcome. -->
-
-
+Given a query that matches nothing in the listings data, the message in
+session["error"] names at least one concrete thing the user could change
+(price, size, or wording) rather than just saying no results were found —
+5 of 5 tries.
 
 **Why this target:**
+
+This is plain string-building with no model call, so it should be
+consistent every time. I care about this one because "no results" with
+nothing else is a dead end for the user — the whole point of the branch
+message is to tell them what to try next.
 
 
 
