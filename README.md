@@ -84,19 +84,6 @@ change instead of guessing.
 
 ## Planning Loop
 
-<!-- Your branch rule, stated as a rule — the condition AND both paths — plus
-     the file and function that holds it.
-
-     Like this:
-       "If search_listings returns an empty list, put a message in the session
-        and stop. Otherwise take the first result and go to suggest_outfit."
-        — agent.py::run_agent
-
-     The grader checks your code against what you claim here, so the file and
-     function have to be real. -->
-
-## Planning Loop
-
 Branch rule: if search_listings returns an empty list, the loop puts a
 specific message in session["error"] and stops before calling
 suggest_outfit. Otherwise it takes the first search result and continues
@@ -146,27 +133,29 @@ Layer the feminine graphic tee underneath your black cropped zip hoodie for a ba
 
 ## How I Used AI
 
-<!-- Two specific moments. What you asked, what came back, what you changed.
-
-     "I used Claude to help me code" is not enough.
-
-     "I gave Claude my search_listings spec. It returned None on no match
-     instead of an empty list, so I changed it" is the level we want. -->
-
-I used claude extensively on this particular project, in particular to help with implementing the three tool funcitons in tools.py, the planning loop in agent.py, and working with the README and all of the different TODOs in the starter code. I did end up using a keyword matching approached that I asked claude for help on in the search_listings and helped to make sure all the words in the title, description, style, etc. all worked. I also used it to help with testing all of the different loops to help complete all the milestones. 
-
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* Help implementing search_listings — I gave Claude the
+  docstring spec from tools.py (inputs, return shape, empty-case requirement).
+- *What came back:* A keyword-matching approach that splits the description
+  into words and scores listings by overlap with the title, description, and
+  style tags, returning an empty list when nothing scores above zero.
+- *What I changed:* Nothing structurally — I tested it against real data
+  (`graphic tee`, max_price=30) and it returned 6 correctly-matched listings
+  on the first try, so I kept it as given.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* Help wiring the branch logic in agent.py's run_agent(),
+  based on the rule I wrote in Milestone 2 (stop before suggest_outfit if
+  search_listings comes back empty).
+- *What came back:* A version with an indentation error on the first paste —
+  the code didn't run.
+- *What I changed:* Fixed the indentation and re-ran `python agent.py`
+  against both a matching and a non-matching query to confirm the branch
+  actually worked — the non-matching query stopped early with fit_card still
+  None, the matching one completed all three tools.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
