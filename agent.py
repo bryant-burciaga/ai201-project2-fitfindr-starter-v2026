@@ -129,10 +129,19 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         "max_price": max_price,
     }
 
-    # Step 2: search
-    results = search_listings(description, size=size, max_price=max_price)
+    
+    #Step 2: search (now via MCP)
+    from mcp_client import call_tool, MCPError
+    try:
+        results = call_tool("search_listings", {
+            "description": description,
+            "size": size,
+            "max_price": max_price,
+        })
+    except MCPError as exc:
+        session["error"] = f"Couldn't reach the search tool: {exc}"
+        return session
     session["search_results"] = results
-
     # ── THE BRANCH ──
     if not results:
         session["error"] = (
