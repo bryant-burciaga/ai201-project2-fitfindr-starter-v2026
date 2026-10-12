@@ -106,6 +106,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         than a stack trace. The import is already at the top of this file.
     """
     session = new_session(query, wardrobe)
+    trace.start_trace()
 
     import re
 
@@ -128,9 +129,9 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         "size": size,
         "max_price": max_price,
     }
+    trace.step("parse_query", inputs={"query": query}, returned=session["parsed"])
 
-    
-    #Step 2: search (now via MCP)
+    # Step 2: search (now via MCP)
     from mcp_client import call_tool, MCPError
     try:
         results = call_tool("search_listings", {
@@ -140,8 +141,14 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         })
     except MCPError as exc:
         session["error"] = f"Couldn't reach the search tool: {exc}"
+        trace.step("search_listings (via MCP)", note=f"FAILED: {exc}")
         return session
+
     session["search_results"] = results
+    trace.step("search_listings (via MCP)",
+               inputs={"description": description, "size": size, "max_price": max_price},
+               returned=results)
+
     # ── THE BRANCH ──
     if not results:
         session["error"] = (
@@ -150,7 +157,42 @@ def run_agent(query: str, wardrobe: dict) -> dict:
             + (f" in size {size}" if size else "")
             + ". Try a broader description, a higher price, or a different size."
         )
+        trace.step("branch", note="empty search results — stopping before suggest_outfit")
         return session
+
+    # Step 3: pick the top result
+    selected = results[0]
+    session["selected_item"] = selected
+
+    # Step 4: get an outfit suggestion
+    try:
+        outfit = suggest_outfit(selected, wardrobe)
+    except ModelUnavailable as exc:
+        session["error"] = (
+            f"Couldn't reach the model to suggest an outfit: {exc}. "
+            "Check your API key in .env and try again."
+        )
+        trace.step("suggest_outfit", note=f"FAILED: {exc}")
+        return session
+
+    session["outfit_suggestion"] = outfit
+    trace.step("suggest_outfit", inputs={"item": selected.get("title"), "wardrobe_items": len(wardrobe.get("items", []))}, returned=outfit)
+
+    # Step 5: write the fit card
+    try:
+        fit_card = create_fit_card(outfit, selected)
+    except ModelUnavailable as exc:
+        session["error"] = (
+            f"Couldn't reach the model to write a fit card: {exc}. "
+            "Check your API key in .env and try again."
+        )
+        trace.step("create_fit_card", note=f"FAILED: {exc}")
+        return session
+
+    session["fit_card"] = fit_card
+    trace.step("create_fit_card", inputs={"outfit_len": len(outfit)}, returned=fit_card)
+
+    return session
 
     # Step 3: pick the top result
     selected = results[0]
